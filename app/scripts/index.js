@@ -43,7 +43,7 @@ window.onload = function() {
     console.log(account, tokenId);
     try {
       const tx = await toVandalize.methods
-        .approve(account, tokenId)
+        .approve(contractAddress, tokenId)
         .send({ from: account });
       console.log(tx);
     } catch (err) {
@@ -61,15 +61,15 @@ window.onload = function() {
 
     const vandalizer = new web3.eth.Contract(
       CryptoVandals,
-      "0x7d39a15c9544d74a7cad4e2956dcd74423cfe0dd"
+      "0x345ca3e014aaf5dca488057592ee47305d9b3e10"
     );
     try {
-      console.log(contractAddress, account, tokenURI, tokenId);
-      const tx = await vandalizer.methods
+      console.log(contractAddress, account, "https://ipfs.infura-io/ipfs/"+hash, tokenId);
+      const tx2 = await vandalizer.methods
         .mint(
           contractAddress,
           account,
-          "https://ipfs.infura.io/ipfs/" + tokenURI,
+          "https://ipfs.infura.io/ipfs/" + hash,
           tokenId
         )
         .send({ from: account });
