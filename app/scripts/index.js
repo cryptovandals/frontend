@@ -40,18 +40,18 @@ window.onload = function() {
 
     const toVandalize = new web3.eth.Contract(ABI, contractAddress);
     try {
-      const tx = await toVandalize.methods.approve(account, tokenId);
+      const tx = await toVandalize.methods.approve(account, tokenId).send({from: account})
     } catch (err) {
       console.log(err);
     }
 
-    tokenURI = {
+    const tokenURI = {
       name,
       description: "A vandalized image...",
       image
     };
 
-    const res = ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)));
+    const res = await ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)));
     const hash = res[0].hash;
 
     const vandalizer = new web3.eth.Contract(
@@ -65,7 +65,7 @@ window.onload = function() {
         account,
         "https://ipfs.infura.io/ipfs/" + tokenURI,
         tokenId
-      );
+      ).send({from: account})
     } catch (err) {
       console.log(err);
     }

@@ -3,11 +3,11 @@
       "constant": true,
       "inputs": [
         {
-          "name": "_interfaceid",
+          "name": "_interfaceId",
           "type": "bytes4"
         }
       ],
-      "name": "supportsinterface",
+      "name": "supportsInterface",
       "outputs": [
         {
           "name": "",
@@ -15,7 +15,7 @@
         }
       ],
       "payable": false,
-      "statemutability": "view",
+      "stateMutability": "view",
       "type": "function"
     },
     {
