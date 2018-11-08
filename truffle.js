@@ -11,6 +11,11 @@ const rinkebyProvider = new WalletProvider(rinkebyWallet, 'https://rinkeby.infur
 module.exports = {
   networks: {
     development: {
+      host: 'localhost',
+      port: 8545,
+      network_id: '15'
+    },
+    rinkeby: {
       provider: rinkebyProvider,
       gas: 4600000,
       gasPrice: web3.utils.toWei('20', 'gwei'),

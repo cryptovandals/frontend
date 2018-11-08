@@ -45,6 +45,7 @@ window.onload = function() {
       const tx = await toVandalize.methods
         .approve(account, tokenId)
         .send({ from: account });
+      console.log(tx);
     } catch (err) {
       console.log(err);
     }
