@@ -54,7 +54,10 @@ window.onload = function() {
     const res = ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)));
     const hash = res[0].hash;
 
-    const vandalizer = new web3.eth.Contract(ABI, "");
+    const vandalizer = new web3.eth.Contract(
+      ABI,
+      "0x125e97f84d21c78decc60d6b604f4b138706500a"
+    );
     try {
       console.log(contractAddress, account, tokenURI, tokenId);
       const tx = await vandalizer.methods.mint(
