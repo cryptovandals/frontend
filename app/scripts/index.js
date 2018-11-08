@@ -4,7 +4,8 @@ import IPFS from "ipfs-api";
 import buffer from "buffer";
 
 import getWeb3 from "./getWeb3";
-import ABI from "./ABI.json";
+import VandalizeMe from "./VandalizeMe.json";
+import CryptoVandals from "./CryptoVandals.json";
 
 window.onload = function() {
   const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
@@ -38,9 +39,12 @@ window.onload = function() {
     const name = document.querySelector("input[name='name']").value;
     const image = await upload();
 
-    const toVandalize = new web3.eth.Contract(ABI, contractAddress);
+    const toVandalize = new web3.eth.Contract(VandalizeMe, contractAddress);
+    console.log(account, tokenId);
     try {
-      const tx = await toVandalize.methods.approve(account, tokenId).send({from: account})
+      const tx = await toVandalize.methods
+        .approve(account, tokenId)
+        .send({ from: account });
     } catch (err) {
       console.log(err);
     }
@@ -55,17 +59,19 @@ window.onload = function() {
     const hash = res[0].hash;
 
     const vandalizer = new web3.eth.Contract(
-      ABI,
-      "0x125e97f84d21c78decc60d6b604f4b138706500a"
+      CryptoVandals,
+      "0x7d39a15c9544d74a7cad4e2956dcd74423cfe0dd"
     );
     try {
       console.log(contractAddress, account, tokenURI, tokenId);
-      const tx = await vandalizer.methods.mint(
-        contractAddress,
-        account,
-        "https://ipfs.infura.io/ipfs/" + tokenURI,
-        tokenId
-      ).send({from: account})
+      const tx = await vandalizer.methods
+        .mint(
+          contractAddress,
+          account,
+          "https://ipfs.infura.io/ipfs/" + tokenURI,
+          tokenId
+        )
+        .send({ from: account });
     } catch (err) {
       console.log(err);
     }
