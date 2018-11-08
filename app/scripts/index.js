@@ -5,7 +5,7 @@ import buffer from "buffer";
 
 import getWeb3 from "./getWeb3";
 import VandalizeMe from "./VandalizeMe.json";
-import CryptoVandals from "./CryptoVandals.json";
+import CryptoVandals from "./contracts/CryptoVandals.json";
 
 window.onload = function() {
   const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
@@ -39,8 +39,10 @@ window.onload = function() {
     const name = document.querySelector("input[name='name']").value;
     const image = await upload();
 
-    const toVandalize = new web3.eth.Contract(VandalizeMe, contractAddress);
-    console.log(account, tokenId);
+    console.log('step 1: make the NFT available to transfer by calling "approve".')
+    console.log('        source contract:', contractAddress , 'token id:', tokenId)
+
+    const toVandalize = new web3.eth.Contract(VandalizeMe, contractAddress)
     try {
       const tx = await toVandalize.methods
         .approve(contractAddress, tokenId)
@@ -48,6 +50,7 @@ window.onload = function() {
       console.log(tx);
     } catch (err) {
       console.log(err);
+      return
     }
 
     const tokenURI = {
@@ -56,12 +59,15 @@ window.onload = function() {
       image
     };
 
-    const res = await ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)));
+    console.log('step 2: upload new vandalized image to IPFS')
+    const res = await ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)))
     const hash = res[0].hash;
 
+    console.log('step 3: "mint" a new token in the CryptoVandals contract.')
+    console.log('        contract address:', CryptoVandals.address)
     const vandalizer = new web3.eth.Contract(
-      CryptoVandals,
-      "0x345ca3e014aaf5dca488057592ee47305d9b3e10"
+      CryptoVandals.abi,
+      CryptoVandals.address
     );
     try {
       console.log(contractAddress, account, "https://ipfs.infura-io/ipfs/"+hash, tokenId);
@@ -75,6 +81,7 @@ window.onload = function() {
         .send({ from: account });
     } catch (err) {
       console.log(err);
+      return
     }
   };
 };
