@@ -5,7 +5,7 @@ import buffer from "buffer";
 
 import getWeb3 from "./getWeb3";
 import VandalizeMe from "./VandalizeMe.json";
-import CryptoVandals from "./contracts/CryptoVandals.json";
+import CryptoVandals from "../contracts/CryptoVandals.json";
 
 window.onload = function() {
   const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
@@ -73,8 +73,8 @@ window.onload = function() {
       console.log(contractAddress, account, "https://ipfs.infura-io/ipfs/"+hash, tokenId);
       const tx2 = await vandalizer.methods
         .mint(
-          contractAddress,
           account,
+          contractAddress,
           "https://ipfs.infura.io/ipfs/" + hash,
           tokenId
         )

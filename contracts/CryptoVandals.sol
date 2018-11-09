@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
@@ -13,14 +13,14 @@ contract CryptoVandals is Ownable, ERC721Token {
   }
 
   function mint(
-    address _source,
     address _to,
+    address _source,
     string  _tokenURI,
     uint256 _tokenId
   ) external
   {
     ITransferContract sourceContract = ITransferContract(_source);
-    sourceContract.transferFrom(address(this), address(1), _tokenId);
+    sourceContract.transferFrom(_to, address(1), _tokenId);
     uint workId = works.push(_tokenURI) - 1;
     super._mint(_to, workId);
     super._setTokenURI(workId, _tokenURI);
