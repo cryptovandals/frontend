@@ -1,33 +1,44 @@
-const path = require('path')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+// @format
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
+
+const outputDirectory = "dist";
 
 module.exports = {
-  entry: './app/scripts/index.js',
-  mode: 'production',
+  entry: "./app/scripts/index.js",
+  devtool: "source-map",
   output: {
-    path: path.resolve(__dirname, 'build'),
-    filename: 'app.js'
+    path: path.join(__dirname, outputDirectory),
+    filename: "bundle.js"
   },
-  plugins: [
-    // Copy our app's index.html to the build folder.
-    new CopyWebpackPlugin([
-      { from: './app/index.html', to: 'index.html' }
-    ])
-  ],
-  devtool: 'source-map',
   module: {
     rules: [
-      { test: /\.s?css$/, use: [ 'style-loader', 'css-loader', 'sass-loader' ] },
       {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['env'],
-          plugins: ['transform-react-jsx', 'transform-object-rest-spread', 'transform-runtime']
-        }
+        exclude: /node_modules/,
+        use: ["babel-loader"]
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"]
+      },
+      {
+        test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+        loader: "url-loader?limit=100000"
       }
     ]
-  }
-}
-
+  },
+  devServer: {
+    port: 3000,
+    historyApiFallback: true
+  },
+  plugins: [
+    new CleanWebpackPlugin([outputDirectory]),
+    new HtmlWebpackPlugin({
+      template: "./app/index.html"
+    }),
+    new FaviconsWebpackPlugin("./assets/cryptovandals-logo.png")
+  ]
+};

@@ -1,4 +1,5 @@
 // @format
+import "@babel/polyfill";
 import Web3 from "web3";
 import IPFS from "ipfs-api";
 import buffer from "buffer";
@@ -35,7 +36,10 @@ window.onload = function() {
     const contractAddress = document.querySelector(
       "input[name='contractAddress']"
     ).value;
-    const tokenId = parseInt(document.querySelector("input[name='tokenId']").value, 10);
+    const tokenId = parseInt(
+      document.querySelector("input[name='tokenId']").value,
+      10
+    );
     const name = document.querySelector("input[name='name']").value;
     const image = await upload();
 
