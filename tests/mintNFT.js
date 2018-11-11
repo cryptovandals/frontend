@@ -15,7 +15,8 @@ const privateKey = Buffer.from(g('PRIVATE_KEY'), 'hex')
 function loadContract(name) {
     const metadata = require(`../build/contracts/${name}.json`)
     const contractAbi = metadata.abi
-    const contractAddress = metadata.networks['5777'].address
+    console.log(metadata.networks);
+    const contractAddress = metadata.networks['15'].address
     const contract = new web3.eth.Contract(contractAbi, contractAddress)
     return contract
 }
@@ -67,16 +68,19 @@ async function mint () {
     }
 
     count = await web3.eth.getTransactionCount(address)
+    console.log(address, vandalizeMeContract.options.address)
     rawTx = {
         "from": address,
         "to": cryptoVandalsContract.options.address,
         "nonce": web3.utils.toHex(count),
         "gasprice": web3.utils.toHex(web3.utils.toWei('50', 'gwei')),
         "gasLimit": web3.utils.toHex(2000000),
+
         "data": cryptoVandalsContract.methods.mint(address, vandalizeMeContract.options.address, "http://example.com", 0).encodeABI(),
     }
     tx = new Tx(rawTx)
     tx.sign(privateKey)
+    console.log(tx.serialize().toString("hex"))
     try {
         await web3.eth.sendSignedTransaction('0x' + tx.serialize().toString('hex'))
     } catch (e) {
