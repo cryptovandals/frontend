@@ -3,11 +3,18 @@ import React, { Component } from "react";
 import Web3 from "web3";
 import IPFS from "ipfs-api";
 import buffer from "buffer";
+import { createGlobalStyle } from "styled-components";
 
 import getWeb3 from "./getWeb3";
 import VandalizeMe from "./VandalizeMe.json";
 import CryptoVandals from "../contracts/CryptoVandals.json";
 import logo from "../../assets/cryptovandals-logo.png";
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    font-family: 'VT323', monospace;
+  }
+`;
 
 class App extends Component {
   constructor(props) {
@@ -99,6 +106,7 @@ class App extends Component {
   render() {
     return (
       <div>
+        <GlobalStyle />
         <h1>Vandalize Cryptokitty</h1>
         <img src={logo} />
         <br />
@@ -112,7 +120,6 @@ class App extends Component {
         <input type="file" ref="image" accept="image/png, image/jpeg" />
         <input
           type="submit"
-          class="button"
           onClick={this.vandalize}
           value="Send Request"
         />
