@@ -1,20 +1,42 @@
+/**
+ *    mmm                         m
+ *  m"   "  m mm  m   m  mmmm   mm#mm   mmm
+ *  #       #"  " "m m"  #" "#    #    #" "#
+ *  #       #      #m#   #   #    #    #   #
+ *   "mmm"  #      "#    ##m#"    "mm  "#m#"
+ *                 m"    #
+ *                ""     "
+ *       m    m                   #         ""#
+ *       "m  m"  mmm   m mm    mmm#   mmm     #     mmm
+ *        #  #  "   #  #"  #  #" "#  "   #    #    #   "
+ *        "mm"  m"""#  #   #  #   #  m"""#    #     """m
+ *         ##   "mm"#  #   #  "#m##  "mm"#    "mm  "mmm"
+ */
+
+
+
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Basic.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
 
-contract CryptoVandals is Ownable, ERC721Token {
+// We use OpenZeppelin ERC-721 as a baseline for our contract.
+contract CryptoVandals is ERC721Token {
 
-  struct Remix {
+  // Every new NFT token minted by this contract has one or two sources,
+  // stored in the struct `Source`.
+  struct Source {
     address contract1;
     uint256 tokenId1;
     address contract2;
     uint256 tokenId2;
   }
 
-  mapping(uint256 => Remix) public remixes;
+  //
+  mapping(uint256 => Source) public sources;
 
+  // Constructor to initialize the name and the symbol for this contract.
   constructor (string _name, string _symbol) public
     ERC721Token(_name, _symbol)
   {
@@ -32,27 +54,36 @@ contract CryptoVandals is Ownable, ERC721Token {
     string  _newTokenURI
   ) external
   {
+    //
     require(_sourceContract1.isContract());
     require(_sourceContract2 == address(0) || _sourceContract2.isContract());
 
-    ERC721Basic(_sourceContract1).transferFrom(_owner, address(1), _sourceTokenId1);
+    ERC721Basic(_sourceContract1).transferFrom(
+      _owner,
+      address(1),
+      _sourceTokenId1);
 
     if (_sourceContract2 != address(0)) {
-      ERC721Basic(_sourceContract2).transferFrom(_owner, address(1), _sourceTokenId2);
+      ERC721Basic(_sourceContract2).transferFrom(
+        _owner,
+        address(1),
+        _sourceTokenId2);
     }
 
-    uint newTokenId = totalSupply().add(1);
+    uint newTokenId = totalSupply();
 
-    Remix memory remix = Remix({
+    Source memory source = Source({
       contract1: _sourceContract1,
       tokenId1: _sourceTokenId1,
       contract2: _sourceContract2,
       tokenId2: _sourceTokenId2
     });
 
-    remixes[newTokenId] = remix;
+    sources[newTokenId] = source;
 
     super._mint(_owner, newTokenId);
     super._setTokenURI(newTokenId, _newTokenURI);
   }
 }
+
+// [1]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
