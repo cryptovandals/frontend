@@ -11,7 +11,9 @@ class SimpleWallet {
     }
     this.web3 = new Web3(provider);
     this.privateKey = privateKey;
-    this.account = this.web3.eth.accounts.privateKeyToAccount(privateKey);
+    this.account = this.web3.eth.accounts.privateKeyToAccount(
+      "0x" + privateKey
+    );
     this.address = this.account.address;
   }
 
@@ -36,7 +38,7 @@ class SimpleWallet {
       data: data
     };
     var tx = new Tx(rawTx);
-    tx.sign(Buffer.from(this.privateKey.substr(2), "hex"));
+    tx.sign(Buffer.from(this.privateKey, "hex"));
     await this.web3.eth.sendSignedTransaction(
       "0x" + tx.serialize().toString("hex")
     );

@@ -6,7 +6,7 @@ const Wallet = require("ethereumjs-wallet");
 
 const g = (name, fallback) => process.env[name] || fallback;
 const web3 = new Web3();
-const privateKey = new Buffer(g("PRIVATE_KEY").substr(2), "hex");
+const privateKey = new Buffer(g("PRIVATE_KEY"), "hex");
 const wallet = Wallet.fromPrivateKey(privateKey);
 const provider = new WalletProvider(
   wallet,
