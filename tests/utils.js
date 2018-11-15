@@ -15,7 +15,7 @@ class SimpleWallet {
   }
 
   async loadContract(name) {
-    const metadata = require(`../build/contracts/${name}.json`);
+    const metadata = require(`../deployment/contracts/${name}.json`);
     const networkId = await this.web3.eth.net.getId();
     const contractAbi = metadata.abi;
     const contractAddress = metadata.networks[networkId].address;

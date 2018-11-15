@@ -2,12 +2,15 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import Web3 from "web3";
+import Utils from "web3-utils";
 import IPFS from "ipfs-api";
 import buffer from "buffer";
+import Spinner from "react-spinkit";
 
 import getWeb3 from "./getWeb3";
-import VandalizeMe from "../../build/contract/VandalizeMe.json";
-import CryptoVandals from "../../build/contracts/CryptoVandals.json";
+import getContract from "./contracts";
+import VandalizeMe from "../../deployment/contracts/VandalizeMe.json";
+import CryptoVandals from "../../deployment/contracts/CryptoVandals.json";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -36,7 +39,8 @@ class Wallet extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      kitties: []
+      kitties: [],
+      loading: false
     };
     this.vandalize = this.vandalize.bind(this);
   }
@@ -54,11 +58,87 @@ class Wallet extends Component {
     return kitties;
   }
 
+  async getTokens(web3, address) {
+    const contract = await getContract(web3, VandalizeMe);
+    const outputs = await contract.getPastEvents("Transfer", {
+      fromBlock: 0,
+      toBlock: "latest",
+      topics: [
+        Utils.sha3("Transfer(address,address,uint256)"),
+        Utils.padLeft(address, 64),
+        null
+      ]
+    });
+    const inputs = await contract.getPastEvents("Transfer", {
+      fromBlock: 0,
+      toBlock: "latest",
+      topics: [
+        Utils.sha3("Transfer(address,address,uint256)"),
+        null,
+        Utils.padLeft(address, 64)
+      ]
+    });
+
+    for (let i = 0; i < outputs.length; i++) {
+      const outputTokenId = outputs[i].returnValues._tokenId;
+      for (let j = 0; j < inputs.length; j++) {
+        const inputTokenId = inputs[j].returnValues._tokenId;
+        if (outputTokenId === inputTokenId) {
+          inputs.splice(j, 1);
+        }
+      }
+    }
+
+    const returnValues = inputs.map(event => event.returnValues);
+    const tokenURIPromises = returnValues.map(({ _tokenId }) =>
+      contract.methods.tokenURI(_tokenId).call()
+    );
+    let tokenURIs;
+    try {
+      tokenURIs = await Promise.all(tokenURIPromises);
+    } catch (e) {
+      // TODO: This isn't the right way to overcome this error. What to do?
+      tokenURIs = [];
+      for (let promises in tokenURIPromises) {
+        tokenURIs.push("https://cantdecodestring.com");
+      }
+    }
+
+    const tokenNamePromises = returnValues.map(() =>
+      contract.methods.name().call()
+    );
+    const tokenNames = await Promise.all(tokenNamePromises);
+
+    const tokenJSONPromises = tokenURIs.map(uri =>
+      fetch(uri)
+        .then(res => res.json())
+        .catch(err => null)
+    );
+    const tokenJSON = await Promise.all(tokenJSONPromises);
+    for (let i = 0; i < returnValues.length; i++) {
+      returnValues[i].image_url = tokenJSON[i]["image"];
+      returnValues[i].name = tokenNames[i];
+    }
+
+    return returnValues;
+  }
+
   async componentDidMount() {
+    var kitties;
+    this.setState({ loading: true });
     const web3 = await getWeb3();
+    const networkId = await web3.eth.net.getId();
     const account = (await web3.eth.getAccounts())[0];
-    const kitties = await this.getKitties(account);
-    this.setState({ kitties });
+    try {
+      if (networkId === "1") {
+        kitties = await this.getKitties(account);
+      } else {
+        kitties = await this.getTokens(web3, account);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    this.setState({ kitties, loading: false });
   }
 
   upload() {
@@ -100,7 +180,7 @@ class Wallet extends Component {
       tokenId
     );
 
-    const vandalizeMe = getContract(web3, VandalizeMe);
+    const vandalizeMe = await getContract(web3, VandalizeMe);
     try {
       const tx = await vandalizeMe.methods
         .approve(CryptoVandals.networks[config.networkId].address, tokenId)
@@ -123,7 +203,7 @@ class Wallet extends Component {
 
     console.log('step 3: "mint" a new token in the CryptoVandals contract.');
     console.log("        contract address:", CryptoVandals.address);
-    const cryptoVandals = getContract(web3, CryptoVandals);
+    const cryptoVandals = await getContract(web3, CryptoVandals);
     try {
       const tx2 = await cryptoVandals.methods
         .mint(
@@ -140,17 +220,29 @@ class Wallet extends Component {
   }
 
   render() {
-    const { kitties } = this.state;
-    return (
-      <Wrapper>
-        <h1>Vandalize your kittens!</h1>
-        <KittenContainer>
-          {kitties.map((kitty, i) => (
-            <KittyImage key={i} src={kitty.image_url} />
-          ))}
-        </KittenContainer>
-      </Wrapper>
-    );
+    const { kitties, loading } = this.state;
+
+    if (loading) {
+      return (
+        <Wrapper>
+          <h1>Vandalize your kittens!</h1>
+          <KittenContainer>
+            <Spinner name="wave" color="black" />
+          </KittenContainer>
+        </Wrapper>
+      );
+    } else {
+      return (
+        <Wrapper>
+          <h1>Vandalize your kittens!</h1>
+          <KittenContainer>
+            {kitties.map((kitty, i) => (
+              <KittyImage key={i} src={kitty.image_url} />
+            ))}
+          </KittenContainer>
+        </Wrapper>
+      );
+    }
   }
 }
 

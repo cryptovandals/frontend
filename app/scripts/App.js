@@ -5,6 +5,7 @@ import styled, { createGlobalStyle } from "styled-components";
 import logo from "../../assets/cryptovandals-logo.png";
 import Manifesto from "./Manifesto";
 import Wallet from "./Wallet";
+import Gallery from "./Gallery";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -23,7 +24,7 @@ const Section = styled.section`
   width: 70%;
   padding-left: 15%;
   padding-right: 15%;
-  height: ${props => props.height};
+  min-height: ${props => props.height};
 `;
 
 const Image = styled.img`
@@ -40,6 +41,9 @@ const App = () => (
       <Manifesto />
     </Section>
     <Section backgroundColor="black" color="white" height="65vh">
+      <Gallery />
+    </Section>
+    <Section backgroundColor="white" color="black" height="65vh">
       <Wallet />
     </Section>
   </div>
