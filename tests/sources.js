@@ -49,6 +49,26 @@ async function test() {
     return await lastTokenId(cryptoVandals);
   }
 
+  async function _sourceTree(tokenId) {
+    if (tokenId === "0") return;
+    console.log("->", tokenId);
+    try {
+      const sources = await cryptoVandals.methods.sources(tokenId).call();
+      source1 = sources.tokenId1;
+      source2 = sources.tokenId2;
+      return {
+        [source1]: await _sourceTree(source1),
+        [source2]: await _sourceTree(source2)
+      };
+    } catch {
+      return;
+    }
+  }
+
+  async function sourceTree(tokenId) {
+    return { [tokenId]: await _sourceTree(tokenId) };
+  }
+
   var tokenId;
   const vandalizeMe = await wallet.loadContract("VandalizeMe");
   const cryptoVandals = await wallet.loadContract("CryptoVandals");
@@ -89,6 +109,8 @@ async function test() {
     vandalizeMe,
     tokenId3
   );
+
+  console.log(await sourceTree(vandalizedTokenId2));
 
   const sources1 = await cryptoVandals.methods
     .sources(vandalizedTokenId1)
