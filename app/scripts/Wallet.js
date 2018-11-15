@@ -6,8 +6,8 @@ import IPFS from "ipfs-api";
 import buffer from "buffer";
 
 import getWeb3 from "./getWeb3";
-import VandalizeMe from "./VandalizeMe.json";
-import CryptoVandals from "../contracts/CryptoVandals.json";
+import VandalizeMe from "../../build/contract/VandalizeMe.json";
+import CryptoVandals from "../../build/contracts/CryptoVandals.json";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -100,10 +100,10 @@ class Wallet extends Component {
       tokenId
     );
 
-    const toVandalize = new web3.eth.Contract(VandalizeMe, contractAddress);
+    const vandalizeMe = getContract(web3, VandalizeMe);
     try {
-      const tx = await toVandalize.methods
-        .approve(CryptoVandals.address, tokenId)
+      const tx = await vandalizeMe.methods
+        .approve(CryptoVandals.networks[config.networkId].address, tokenId)
         .send({ from: account });
       console.log(tx);
     } catch (err) {
@@ -123,12 +123,9 @@ class Wallet extends Component {
 
     console.log('step 3: "mint" a new token in the CryptoVandals contract.');
     console.log("        contract address:", CryptoVandals.address);
-    const vandalizer = new web3.eth.Contract(
-      CryptoVandals.abi,
-      CryptoVandals.address
-    );
+    const cryptoVandals = getContract(web3, CryptoVandals);
     try {
-      const tx2 = await vandalizer.methods
+      const tx2 = await cryptoVandals.methods
         .mint(
           account,
           contractAddress,

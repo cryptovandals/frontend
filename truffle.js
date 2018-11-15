@@ -16,8 +16,8 @@ const provider = new WalletProvider(
 module.exports = {
   networks: {
     development: {
-      provider: provider,
-      network_id: "*"
+      provider: "localhost",
+      network_id: '*'
     },
     rinkeby: {
       provider: provider,
