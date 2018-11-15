@@ -1,6 +1,7 @@
 // @format
 import React, { Component } from "react";
 import styled from "styled-components";
+import Spinner from "react-spinkit";
 
 import getWeb3 from "./getWeb3";
 import CryptoVandals from "../../build/contracts/CryptoVandals.json";
@@ -27,10 +28,12 @@ class Gallery extends Component {
     super(props);
 
     this.state = {
+      loading: false,
       tokens: []
     };
   }
   async getEvents() {
+    this.setState({ loading: true });
     const web3 = await getWeb3();
     const cryptoVandals = getContract(web3, CryptoVandals);
 
@@ -68,7 +71,7 @@ class Gallery extends Component {
     });
 
     var tokens = await Promise.all(tokenPromises);
-    this.setState({ tokens });
+    this.setState({ tokens, loading: false });
   }
 
   async componentDidMount() {
@@ -76,17 +79,26 @@ class Gallery extends Component {
   }
 
   render() {
-    const { tokens } = this.state;
-    return (
-      <Wrapper>
-        <h1>Vandalized Gallery</h1>
+    const { tokens, loading } = this.state;
+
+    if (loading) {
+      return (
         <GalleryContainer>
-          {tokens.map(token => (
-            <GalleryImage src={token && token.image} />
-          ))}
+          <Spinner name="wave" />
         </GalleryContainer>
-      </Wrapper>
-    );
+      );
+    } else {
+      return (
+        <Wrapper>
+          <h1>Vandalized Gallery</h1>
+          <GalleryContainer>
+            {tokens.map(token => (
+              <GalleryImage src={token && token.image} />
+            ))}
+          </GalleryContainer>
+        </Wrapper>
+      );
+    }
   }
 }
 
