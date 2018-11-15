@@ -4,8 +4,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
 
 contract VandalizeMe is Ownable, ERC721Token {
-  string[] public works;
-
   constructor (string _name, string _symbol) public
     ERC721Token(_name, _symbol)
   {
@@ -16,8 +14,8 @@ contract VandalizeMe is Ownable, ERC721Token {
     string  _tokenURI
   ) external
   {
-    uint workId = works.push(_tokenURI) - 1;
-    super._mint(_to, workId);
-    super._setTokenURI(workId, _tokenURI);
+    uint newTokenId = totalSupply();
+    super._mint(_to, newTokenId);
+    super._setTokenURI(newTokenId, _tokenURI);
   }
 }
