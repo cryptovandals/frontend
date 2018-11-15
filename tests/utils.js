@@ -31,7 +31,7 @@ class SimpleWallet {
       to: method._parent.options.address,
       nonce: this.web3.utils.toHex(count),
       gasPrice: this.web3.utils.toHex(this.web3.utils.toWei("21", "gwei")),
-      gasLimit: this.web3.utils.toHex(await method.estimateGas()),
+      gasLimit: this.web3.utils.toHex(await method.estimateGas({from: this.address})),
       data: data
     };
     var tx = new Tx(rawTx);
