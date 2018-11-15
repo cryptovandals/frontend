@@ -3,7 +3,7 @@ const Web3Utils = require("web3-utils");
 const Tx = require("ethereumjs-tx");
 
 class SimpleWallet {
-  constructor(privateKey, provider) {
+  constructor(privateKey, publicKey, provider) {
     if (provider === undefined || typeof provider === "string") {
       provider = new Web3.providers.HttpProvider(
         provider || "http://localhost:8545"
@@ -11,10 +11,7 @@ class SimpleWallet {
     }
     this.web3 = new Web3(provider);
     this.privateKey = privateKey;
-    this.account = this.web3.eth.accounts.privateKeyToAccount(
-      "0x" + privateKey
-    );
-    this.address = this.account.address;
+    this.address = publicKey;
   }
 
   async loadContract(name) {
@@ -33,8 +30,8 @@ class SimpleWallet {
       from: this.address,
       to: method._parent.options.address,
       nonce: this.web3.utils.toHex(count),
-      gasPrice: this.web3.utils.toHex(this.web3.utils.toWei("20", "gwei")),
-      gasLimit: this.web3.utils.toHex(2000000),
+      gasPrice: this.web3.utils.toHex(this.web3.utils.toWei("21", "gwei")),
+      gasLimit: this.web3.utils.toHex(await method.estimateGas()),
       data: data
     };
     var tx = new Tx(rawTx);

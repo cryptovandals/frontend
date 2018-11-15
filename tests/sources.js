@@ -4,7 +4,7 @@ const c = require("colors");
 
 const g = (name, fallback) => process.env[name] || fallback;
 
-const wallet = new SimpleWallet(g("PRIVATE_KEY"));
+const wallet = new SimpleWallet(g("PRIVATE_KEY"), g("PUBLIC_KEY"));
 
 async function test() {
   async function lastTokenId(contract) {

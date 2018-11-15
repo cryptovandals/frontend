@@ -1,10 +1,12 @@
+// @format
 require("dotenv").config();
 const SimpleWallet = require("./utils");
+const web3 = require("web3");
 const c = require("colors");
 
 const g = (name, fallback) => process.env[name] || fallback;
 
-const wallet = new SimpleWallet(g("PRIVATE_KEY"));
+const wallet = new SimpleWallet(g("PRIVATE_KEY"), g("PUBLIC_KEY"));
 
 async function test() {
   var tokenId;
@@ -28,7 +30,7 @@ async function test() {
 
   for (tokenId = 0; ; tokenId++) {
     var owner = await wallet.call(vandalizeMe.methods.ownerOf(tokenId));
-    if (owner === wallet.address) break;
+    if (owner === web3.utils.toChecksumAddress(wallet.address)) break;
   }
 
   console.log(
