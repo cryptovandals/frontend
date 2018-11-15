@@ -41,10 +41,10 @@ const App = () => (
       <Manifesto />
     </Section>
     <Section backgroundColor="black" color="white" height="65vh">
-      <Wallet />
+      <Gallery />
     </Section>
     <Section backgroundColor="white" color="black" height="65vh">
-      <Gallery />
+      <Wallet />
     </Section>
   </div>
 );

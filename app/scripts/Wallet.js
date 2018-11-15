@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Web3 from "web3";
 import IPFS from "ipfs-api";
 import buffer from "buffer";
+import Spinner from "react-spinkit";
 
 import getWeb3 from "./getWeb3";
 import VandalizeMe from "../../build/contracts/VandalizeMe.json";
@@ -36,7 +37,8 @@ class Wallet extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      kitties: []
+      kitties: [],
+      loading: false
     };
     this.vandalize = this.vandalize.bind(this);
   }
@@ -55,10 +57,11 @@ class Wallet extends Component {
   }
 
   async componentDidMount() {
+    this.setState({ loading: true });
     const web3 = await getWeb3();
     const account = (await web3.eth.getAccounts())[0];
     const kitties = await this.getKitties(account);
-    this.setState({ kitties });
+    this.setState({ kitties, loading: false });
   }
 
   upload() {
@@ -140,17 +143,26 @@ class Wallet extends Component {
   }
 
   render() {
-    const { kitties } = this.state;
-    return (
-      <Wrapper>
-        <h1>Vandalize your kittens!</h1>
+    const { kitties, loading } = this.state;
+
+    if (loading) {
+      return (
         <KittenContainer>
-          {kitties.map((kitty, i) => (
-            <KittyImage key={i} src={kitty.image_url} />
-          ))}
+          <Spinner name="wave" color="black" />
         </KittenContainer>
-      </Wrapper>
-    );
+      );
+    } else {
+      return (
+        <Wrapper>
+          <h1>Vandalize your kittens!</h1>
+          <KittenContainer>
+            {kitties.map((kitty, i) => (
+              <KittyImage key={i} src={kitty.image_url} />
+            ))}
+          </KittenContainer>
+        </Wrapper>
+      );
+    }
   }
 }
 

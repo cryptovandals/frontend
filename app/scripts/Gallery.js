@@ -84,7 +84,7 @@ class Gallery extends Component {
     if (loading) {
       return (
         <GalleryContainer>
-          <Spinner name="wave" />
+          <Spinner name="wave" color="white" />
         </GalleryContainer>
       );
     } else {
@@ -92,8 +92,8 @@ class Gallery extends Component {
         <Wrapper>
           <h1>Vandalized Gallery</h1>
           <GalleryContainer>
-            {tokens.map(token => (
-              <GalleryImage src={token && token.image} />
+            {tokens.map((token, i) => (
+              <GalleryImage key={i} src={token && token.image} />
             ))}
           </GalleryContainer>
         </Wrapper>
