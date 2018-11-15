@@ -6,7 +6,11 @@ const c = require("colors");
 
 const g = (name, fallback) => process.env[name] || fallback;
 
-const wallet = new SimpleWallet(g("PRIVATE_KEY"), g("PUBLIC_KEY"));
+const wallet = new SimpleWallet(
+  g("PRIVATE_KEY"),
+  g("PUBLIC_KEY"),
+  g("RPC_ENDPOINT")
+);
 
 async function test() {
   var tokenId;
@@ -59,7 +63,7 @@ async function test() {
       tokenId,
       0,
       0,
-      "http://example.com"
+      "https://ipfs.infura.io/ipfs/QmNiDWpbUrHku1zF5txNGsnYGxwn1riPRyahhvAdR7oiC1"
     )
   );
 

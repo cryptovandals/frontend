@@ -6,7 +6,7 @@ import IPFS from "ipfs-api";
 import buffer from "buffer";
 
 import getWeb3 from "./getWeb3";
-import VandalizeMe from "../../build/contract/VandalizeMe.json";
+import VandalizeMe from "../../build/contracts/VandalizeMe.json";
 import CryptoVandals from "../../build/contracts/CryptoVandals.json";
 
 const Wrapper = styled.div`
