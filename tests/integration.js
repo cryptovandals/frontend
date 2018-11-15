@@ -12,16 +12,14 @@ async function test() {
   const cryptoVandals = await wallet.loadContract("CryptoVandals");
 
   console.log("Setup values");
-  console.log("  User wallet address", wallet.address.green);
-
+  console.log("  User wallet address", c.green(wallet.address));
   console.log(
     "  VandalizeMe smart contract address",
-    vandalizeMe.options.address.green
+    c.green(vandalizeMe.options.address)
   );
-
   console.log(
     "  CryptoVandals smart contract address",
-    cryptoVandals.options.address.green
+    c.green(cryptoVandals.options.address)
   );
 
   await wallet.send(
@@ -37,7 +35,7 @@ async function test() {
     " ",
     c.green(await wallet.call(vandalizeMe.methods.ownerOf(tokenId))),
     "owns",
-    `${c.red(tokenId)}@${vandalizeMe.options.address.green}`
+    `${c.red(tokenId)}@${c.green(vandalizeMe.options.address)}`
   );
 
   console.log("\nstart vandalization\n".rainbow.bold);
@@ -49,7 +47,7 @@ async function test() {
   console.log(
     c.green(await wallet.call(vandalizeMe.methods.getApproved(tokenId))),
     "approved to transfer",
-    `${c.red(tokenId)}@${vandalizeMe.options.address.green}`
+    `${c.red(tokenId)}@${c.green(vandalizeMe.options.address)}`
   );
 
   await wallet.send(
@@ -66,12 +64,12 @@ async function test() {
   console.log(
     c.green(await wallet.call(vandalizeMe.methods.ownerOf(tokenId))),
     "owns",
-    `${c.red(tokenId)}@${vandalizeMe.options.address.green}`
+    `${c.red(tokenId)}@${c.green(vandalizeMe.options.address)}`
   );
   console.log(
     c.green(await wallet.call(cryptoVandals.methods.ownerOf(tokenId))),
     "owns",
-    `${c.red(tokenId)}@${cryptoVandals.options.address.green}`
+    `${c.red(tokenId)}@${c.green(cryptoVandals.options.address)}`
   );
 }
 
