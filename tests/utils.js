@@ -31,7 +31,7 @@ class SimpleWallet {
       from: this.address,
       to: method._parent.options.address,
       nonce: this.web3.utils.toHex(count),
-      gasprice: this.web3.utils.toHex(this.web3.utils.toWei("20", "gwei")),
+      gasPrice: this.web3.utils.toHex(this.web3.utils.toWei("20", "gwei")),
       gasLimit: this.web3.utils.toHex(2000000),
       data: data
     };
