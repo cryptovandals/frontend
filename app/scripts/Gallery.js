@@ -2,6 +2,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import Spinner from "react-spinkit";
+import Utils from "web3-utils";
 
 import getWeb3 from "./getWeb3";
 import CryptoVandals from "../../build/contracts/CryptoVandals.json";
@@ -35,24 +36,24 @@ class Gallery extends Component {
   async getEvents() {
     this.setState({ loading: true });
     const web3 = await getWeb3();
-    const cryptoVandals = getContract(web3, CryptoVandals);
+    const cryptoVandals = await getContract(web3, CryptoVandals);
 
     let events;
     try {
       events = await cryptoVandals.getPastEvents("allEvents", {
         fromBlock: 0,
-        toBlock: "latest"
+        toBlock: "latest",
+        topic: [
+          Utils.sha3("Transfer(address,address,uint256)"),
+          // NOTE: Get all events where tokens are being generated from the 0x0
+          // address
+          Utils.padLeft("0x0000000000000000000000000000000000000000", 64),
+          null
+        ]
       });
     } catch (err) {
       alert(err);
     }
-    // NOTE: Get all events where tokens are being generated from the 0x0
-    // address
-    events = events.filter(
-      event =>
-        event.returnValues._from ===
-        "0x0000000000000000000000000000000000000000"
-    );
 
     const tokenIds = events.map(event => event.returnValues._tokenId);
 

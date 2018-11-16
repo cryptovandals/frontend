@@ -103,7 +103,7 @@ class Wallet extends Component {
       tokenId
     );
 
-    const vandalizeMe = getContract(web3, VandalizeMe);
+    const vandalizeMe = await getContract(web3, VandalizeMe);
     try {
       const tx = await vandalizeMe.methods
         .approve(CryptoVandals.networks[config.networkId].address, tokenId)
@@ -126,7 +126,7 @@ class Wallet extends Component {
 
     console.log('step 3: "mint" a new token in the CryptoVandals contract.');
     console.log("        contract address:", CryptoVandals.address);
-    const cryptoVandals = getContract(web3, CryptoVandals);
+    const cryptoVandals = await getContract(web3, CryptoVandals);
     try {
       const tx2 = await cryptoVandals.methods
         .mint(
