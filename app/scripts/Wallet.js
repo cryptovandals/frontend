@@ -116,7 +116,7 @@ class Wallet extends Component {
     );
     const tokenJSON = await Promise.all(tokenJSONPromises);
     for (let i = 0; i < returnValues.length; i++) {
-      returnValues[i].image_url = tokenJSON[i]["image"];
+      returnValues[i].image_url = tokenJSON[i] && tokenJSON[i]["image"];
       returnValues[i].name = tokenNames[i];
     }
 
@@ -124,7 +124,7 @@ class Wallet extends Component {
   }
 
   async componentDidMount() {
-    var kitties;
+    let kitties;
     this.setState({ loading: true });
     const web3 = await getWeb3();
     const networkId = await web3.eth.net.getId();
