@@ -2,6 +2,14 @@ const Web3 = require("web3");
 const Web3Utils = require("web3-utils");
 const Tx = require("ethereumjs-tx");
 
+const NETWORK_NAMES = {
+  1: "Main Ethereum Network",
+  3: "Ropsten Test Network",
+  4: "Rinkeby Test Network",
+  42: "Kovan Test Network",
+  5777: "Ganache Local Node"
+};
+
 class SimpleWallet {
   constructor(privateKey, publicKey, provider) {
     if (provider === undefined || typeof provider === "string") {
@@ -12,6 +20,11 @@ class SimpleWallet {
     this.web3 = new Web3(provider);
     this.privateKey = privateKey;
     this.address = publicKey;
+  }
+
+  async getNetworkName() {
+    const networkId = await this.web3.eth.net.getId();
+    return NETWORK_NAMES[networkId] || "Unknown Network";
   }
 
   async loadContract(name) {
@@ -31,7 +44,9 @@ class SimpleWallet {
       to: method._parent.options.address,
       nonce: this.web3.utils.toHex(count),
       gasPrice: this.web3.utils.toHex(this.web3.utils.toWei("21", "gwei")),
-      gasLimit: this.web3.utils.toHex(await method.estimateGas({from: this.address})),
+      gasLimit: this.web3.utils.toHex(
+        await method.estimateGas({ from: this.address })
+      ),
       data: data
     };
     var tx = new Tx(rawTx);
