@@ -237,7 +237,10 @@ class Wallet extends Component {
           <h1>Vandalize your kittens!</h1>
           <KittenContainer>
             {kitties.map((kitty, i) => (
-              <KittyImage key={i} src={kitty.image_url} />
+              <div>
+                <KittyImage key={i} src={kitty.image_url} />
+                {kitty._tokenId}
+              </div>
             ))}
           </KittenContainer>
         </Wrapper>
