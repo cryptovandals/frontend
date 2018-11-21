@@ -5,7 +5,7 @@ import Spinner from "react-spinkit";
 import Utils from "web3-utils";
 
 import getWeb3 from "./getWeb3";
-import CryptoVandals from "../../build/contracts/CryptoVandals.json";
+import CryptoVandals from "../../deployment/contracts/CryptoVandals.json";
 import getContract from "./contracts";
 
 const Wrapper = styled.div`
