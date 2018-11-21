@@ -161,6 +161,7 @@ class Wallet extends Component {
       reader.readAsArrayBuffer(photo.files[0]);
     });
   }
+
   async vandalize() {
     const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
     const web3 = await getWeb3();
@@ -181,9 +182,10 @@ class Wallet extends Component {
     );
 
     const vandalizeMe = await getContract(web3, VandalizeMe);
+    const networkId = await web3.eth.net.getId();
     try {
       const tx = await vandalizeMe.methods
-        .approve(CryptoVandals.networks[config.networkId].address, tokenId)
+        .approve(CryptoVandals.networks[networkId].address, tokenId)
         .send({ from: account });
       console.log(tx);
     } catch (err) {
@@ -198,7 +200,9 @@ class Wallet extends Component {
     };
 
     console.log("step 2: upload new vandalized image to IPFS");
-    const res = await ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)));
+    const res = await ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)), {
+      pin: true
+    });
     const hash = res[0].hash;
 
     console.log('step 3: "mint" a new token in the CryptoVandals contract.');
