@@ -3,14 +3,13 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import Web3 from "web3";
 import Utils from "web3-utils";
-import IPFS from "ipfs-api";
-import buffer from "buffer";
 import Spinner from "react-spinkit";
+import Modal from "react-modal";
 
+import Canvas from "./Canvas";
 import getWeb3 from "./getWeb3";
 import getContract from "./contracts";
 import VandalizeMe from "../../deployment/contracts/VandalizeMe.json";
-import CryptoVandals from "../../deployment/contracts/CryptoVandals.json";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -35,14 +34,27 @@ const KittyImage = styled.img`
   }
 `;
 
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    width: "100%",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)"
+  }
+};
+
 class Wallet extends Component {
   constructor(props) {
     super(props);
     this.state = {
       kitties: [],
-      loading: false
+      loading: false,
+      modals: {}
     };
-    this.vandalize = this.vandalize.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
   }
 
   async getKitties(address) {
@@ -141,90 +153,16 @@ class Wallet extends Component {
     this.setState({ kitties, loading: false });
   }
 
-  upload() {
-    const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
-    return new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onloadend = function() {
-        const buf = buffer.Buffer(reader.result); // Convert data into buffer
-        ipfs.files.add(buf, (err, result) => {
-          // Upload buffer to IPFS
-          if (err) {
-            console.error(err);
-            return;
-          }
-          let url = `https://ipfs.io/ipfs/${result[0].hash}`;
-          resolve(url);
-        });
-      };
-      const photo = this.refs.image;
-      reader.readAsArrayBuffer(photo.files[0]);
-    });
-  }
-
-  async vandalize() {
-    const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
-    const web3 = await getWeb3();
-    const account = (await web3.eth.getAccounts())[0];
-    const contractAddress = this.refs.contractAddress.value;
-    const tokenId = parseInt(this.refs.tokenId.value, 10);
-    const name = this.refs.name.value;
-    const image = await this.upload();
-
-    console.log(
-      'step 1: make the NFT available to transfer by calling "approve".'
-    );
-    console.log(
-      "        source contract:",
-      contractAddress,
-      "token id:",
-      tokenId
-    );
-
-    const vandalizeMe = await getContract(web3, VandalizeMe);
-    const networkId = await web3.eth.net.getId();
-    try {
-      const tx = await vandalizeMe.methods
-        .approve(CryptoVandals.networks[networkId].address, tokenId)
-        .send({ from: account });
-      console.log(tx);
-    } catch (err) {
-      console.log(err);
-      return;
-    }
-
-    const tokenURI = {
-      name,
-      description: "A vandalized image...",
-      image
+  toggleModal(id) {
+    return () => {
+      const { modals } = this.state;
+      modals[id] = !modals[id];
+      this.setState({ modals });
     };
-
-    console.log("step 2: upload new vandalized image to IPFS");
-    const res = await ipfs.files.add(Buffer.from(JSON.stringify(tokenURI)), {
-      pin: true
-    });
-    const hash = res[0].hash;
-
-    console.log('step 3: "mint" a new token in the CryptoVandals contract.');
-    console.log("        contract address:", CryptoVandals.address);
-    const cryptoVandals = await getContract(web3, CryptoVandals);
-    try {
-      const tx2 = await cryptoVandals.methods
-        .mint(
-          account,
-          contractAddress,
-          "https://ipfs.infura.io/ipfs/" + hash,
-          tokenId
-        )
-        .send({ from: account });
-    } catch (err) {
-      console.log(err);
-      return;
-    }
   }
 
   render() {
-    const { kitties, loading } = this.state;
+    const { kitties, loading, modals } = this.state;
 
     if (loading) {
       return (
@@ -241,7 +179,20 @@ class Wallet extends Component {
           <h1>Vandalize your kittens!</h1>
           <KittenContainer>
             {kitties.map((kitty, i) => (
-              <KittyImage key={i} src={kitty.image_url} />
+              <div key={i}>
+                <KittyImage
+                  onClick={this.toggleModal(i)}
+                  src={kitty.image_url}
+                />
+                <Modal
+                  isOpen={modals[i]}
+                  onRequestClose={this.toggleModal(i)}
+                  style={customStyles}
+                  ariaHideApp={false}
+                >
+                  <Canvas kitty={kitty} />
+                </Modal>
+              </div>
             ))}
           </KittenContainer>
         </Wrapper>
