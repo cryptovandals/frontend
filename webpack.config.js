@@ -3,6 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const outputDirectory = "dist";
 
@@ -39,6 +40,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./app/index.html"
     }),
-    new FaviconsWebpackPlugin("./assets/cryptovandals-logo.png")
+    new FaviconsWebpackPlugin("./assets/cryptovandals-logo.png"),
+    new CopyWebpackPlugin([
+      { context: 'app', from: "./lib/img/*", force: true}
+    ])
   ]
 };
