@@ -27,11 +27,13 @@ class SimpleWallet {
     return NETWORK_NAMES[networkId] || "Unknown Network";
   }
 
-  async loadContract(name) {
+  async loadContract(name, contractAddress) {
     const metadata = require(`../deployment/contracts/${name}.json`);
-    const networkId = await this.web3.eth.net.getId();
     const contractAbi = metadata.abi;
-    const contractAddress = metadata.networks[networkId].address;
+    if (contractAddress === undefined) {
+      const networkId = await this.web3.eth.net.getId();
+      contractAddress = metadata.networks[networkId].address;
+    }
     const contract = new this.web3.eth.Contract(contractAbi, contractAddress);
     return contract;
   }
