@@ -10,7 +10,7 @@ import getContract from "./contracts";
 
 const Wrapper = styled.div`
   width: 100%;
-  text-align: left;
+  text-align: center;
 `;
 
 const GalleryImage = styled.img`
@@ -22,6 +22,10 @@ const GalleryContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const H1 = styled.h1`
+  margin-bottom: 1.5em;
 `;
 
 class Gallery extends Component {
@@ -94,7 +98,7 @@ class Gallery extends Component {
     } else {
       return (
         <Wrapper>
-          <h1>Vandalized Gallery</h1>
+          <H1>Vandalized Gallery</H1>
           <GalleryContainer>
             {tokens.map((token, i) => (
               <GalleryImage key={i} src={token && token.image} />

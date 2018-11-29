@@ -13,7 +13,7 @@ import VandalizeMe from "../../deployment/contracts/VandalizeMe.json";
 
 const Wrapper = styled.div`
   width: 100%;
-  text-align: left;
+  text-align: center;
 `;
 
 const KittenContainer = styled.div`
@@ -32,6 +32,10 @@ const KittyImage = styled.img`
   &: hover {
     filter: grayscale(0%);
   }
+`;
+
+const H1 = styled.h1`
+  margin-bottom: 1.5em;
 `;
 
 const customStyles = {
@@ -176,7 +180,7 @@ class Wallet extends Component {
     } else {
       return (
         <Wrapper>
-          <h1>Vandalize your kittens!</h1>
+          <H1>Vandalize your kittens!</H1>
           <KittenContainer>
             {kitties.map((kitty, i) => (
               <div key={i}>
