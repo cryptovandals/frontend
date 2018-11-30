@@ -4,7 +4,7 @@ const program = require("commander");
 const util = require("util");
 const web3 = require("web3");
 const chalk = require("chalk");
-const SimpleWallet = require("./utils");
+const SimpleWallet = require("./lib/utils");
 const IPFS = require("ipfs-api");
 
 const g = (name, fallback) => process.env[name] || fallback;

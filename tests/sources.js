@@ -1,5 +1,5 @@
 require("dotenv").config();
-const SimpleWallet = require("./utils");
+const SimpleWallet = require("../lib/utils");
 const c = require("colors");
 
 const g = (name, fallback) => process.env[name] || fallback;
