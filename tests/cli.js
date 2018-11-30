@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const program = require("commander");
 const util = require("util");
 const web3 = require("web3");
 const chalk = require("chalk");
@@ -18,6 +19,7 @@ const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
 
 async function runMint(filename, address) {
   var tokenId;
+  address = address || g("PUBLIC_KEY");
   const vandalizeMe = await wallet.loadContract("VandalizeMe");
 
   console.log(chalk`Using {green ${await wallet.getNetworkName()}}
@@ -78,20 +80,16 @@ Minting a new token from file {green ${filename}}
   );
 }
 
-if (process.argv[2] === "mint") {
-  if (process.argv.length < 4) {
-    console.log("usage: node cli.js mint <filename> [address]");
-  } else {
-    runMint(process.argv[3], process.argv[4] || g("PUBLIC_KEY"));
-  }
-} else if (process.argv[2] === "vandalize") {
-  if (process.argv.length < 6) {
-    console.log(
-      "usage: node cli.js vandalize <tokenId> <tokenContract> <newFile>"
-    );
-  } else {
-    runVandalize(process.argv[3], process.argv[4], process.argv[5]);
-  }
-} else {
-  console.log("usage: node cli.js {mint,vandalize}");
-}
+program.version("0.0.1");
+
+program
+  .command("mint <filename> [address]")
+  .description("Mint a new token.")
+  .action(runMint);
+
+program
+  .command("vandalize <tokenId> <tokenContract> <filename>")
+  .description("Vandalize a token.")
+  .action(runVandalize);
+
+program.parse(process.argv);
