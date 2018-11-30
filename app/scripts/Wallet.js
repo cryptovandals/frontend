@@ -44,7 +44,7 @@ const customStyles = {
     left: "50%",
     right: "auto",
     bottom: "auto",
-    width: "100%",
+    width: "60%",
     marginRight: "-50%",
     transform: "translate(-50%, -50%)"
   }
@@ -194,7 +194,7 @@ class Wallet extends Component {
                   style={customStyles}
                   ariaHideApp={false}
                 >
-                  <Canvas kitty={kitty} />
+                  <Canvas toggleModal={this.toggleModal(i)} kitty={kitty} />
                 </Modal>
               </div>
             ))}

@@ -7,11 +7,16 @@ import "literallycanvas/lib/css/literallycanvas.css";
 import IPFS from "ipfs-api";
 import buffer from "buffer";
 import dataUriToBuffer from "data-uri-to-buffer";
+import styled from "styled-components";
 
 import getWeb3 from "./getWeb3";
 import getContract from "./contracts";
 import VandalizeMe from "../../deployment/contracts/VandalizeMe.json";
 import CryptoVandals from "../../deployment/contracts/CryptoVandals.json";
+
+const Wrapper = styled.div`
+  color: black;
+`;
 
 class DrawCanvas extends Component {
   constructor(props) {
@@ -29,13 +34,15 @@ class DrawCanvas extends Component {
       LC.createShape("Image", { x: 0, y: 0, image: newImage, scale: 1 })
     );
     this.vandalize = this.vandalize.bind(this);
+    this.onUpload = this.onUpload.bind(this);
+    this.onCanvas = this.onCanvas.bind(this);
+    this.state = {};
   }
 
-  upload(image) {
+  upload(imageBuffer) {
     const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
     return new Promise(resolve => {
-      image = dataUriToBuffer(image);
-      ipfs.files.add(image, (err, result) => {
+      ipfs.files.add(imageBuffer, (err, result) => {
         // Upload buffer to IPFS
         if (err) {
           console.error(err);
@@ -47,7 +54,23 @@ class DrawCanvas extends Component {
     });
   }
 
-  async vandalize() {
+  onUpload() {
+    const reader = new FileReader();
+    const image = this.refs.image;
+    reader.onloadend = () => {
+      const imageBuffer = buffer.Buffer(reader.result);
+      this.vandalize(imageBuffer);
+    };
+    reader.readAsArrayBuffer(image.files[0]);
+  }
+
+  onCanvas() {
+    const imageSrc = this.lc.getImage();
+    const imageBuffer = dataUriToBuffer(imageSrc.toDataURL());
+    this.vandalize(imageBuffer);
+  }
+
+  async vandalize(imageBuffer) {
     const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
     const web3 = await getWeb3();
     const account = (await web3.eth.getAccounts())[0];
@@ -55,9 +78,7 @@ class DrawCanvas extends Component {
     const contractAddress = VandalizeMe.networks[networkId].address;
     const tokenId = parseInt(this.props.kitty._tokenId, 10);
     const name = "vandalized";
-    const imageSrc = this.lc.getImage();
-    console.log(imageSrc.toDataURL());
-    const image = await this.upload(imageSrc.toDataURL());
+    const image = await this.upload(imageBuffer);
 
     console.log(
       'step 1: make the NFT available to transfer by calling "approve".'
@@ -110,14 +131,48 @@ class DrawCanvas extends Component {
       console.log(err);
       return;
     }
+    this.toggleModal();
   }
+
+  onToolDecision(tool) {
+    return () => {
+      this.setState({ tool });
+    };
+  }
+
   render() {
-    return (
-      <div>
-        <button onClick={this.vandalize}>vandalize</button>
-        <LC.LiterallyCanvasReactComponent lc={this.lc} />
-      </div>
-    );
+    const { tool } = this.state;
+
+    if (!tool) {
+      return (
+        <Wrapper>
+          <h1>
+            Would you like to download the image and vandalize it with your
+            favorite tool or with our in-browser tool?
+          </h1>
+          <button onClick={this.onToolDecision("upload")}>Upload</button>
+          <button onClick={this.onToolDecision("canvas")}>Canvas</button>
+        </Wrapper>
+      );
+    } else if (tool === "upload") {
+      return (
+        <Wrapper>
+          <h1>Todos</h1>
+          <h1>1. Download your original Cryptokitty</h1>
+          <h1>2. Vandalize it!</h1>
+          <h1>3. Reupload it to create a new collectible.!</h1>
+          <input ref="image" type="file" onChange={this.onUpload} />
+        </Wrapper>
+      );
+    } else if (tool === "canvas") {
+      return (
+        <div>
+          <button onClick={this.onCanvas}>vandalize</button>
+          <LC.LiterallyCanvasReactComponent lc={this.lc} />
+        </div>
+      );
+    }
   }
 }
+
 export default DrawCanvas;
