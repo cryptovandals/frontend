@@ -15,13 +15,13 @@
 
 
 
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.21 <0.6.0;
 
-import "openzeppelin-solidity/contracts/token/ERC721/ERC721Basic.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
+import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
+import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 
 // We use OpenZeppelin ERC-721 as a baseline for our contract.
-contract CryptoVandals is ERC721Token {
+contract CryptoVandals is ERC721Full, ERC721Mintable {
 
   // Every new NFT token minted by this contract has one or two sources,
   // stored in the struct `Source`.
@@ -36,8 +36,8 @@ contract CryptoVandals is ERC721Token {
   mapping(uint256 => Source) public sources;
 
   // Constructor to initialize the name and the symbol for this contract.
-  constructor (string _name, string _symbol) public
-    ERC721Token(_name, _symbol)
+  constructor (string memory _name, string memory _symbol) public
+    ERC721Full(_name, _symbol)
   {
   }
 
@@ -50,20 +50,20 @@ contract CryptoVandals is ERC721Token {
     address _sourceContract2,
     uint256 _sourceTokenId2,
 
-    string  _newTokenURI
+    string calldata _newTokenURI
   ) external
   {
     //
     require(_sourceContract1.isContract());
     require(_sourceContract2 == address(0) || _sourceContract2.isContract());
 
-    ERC721Basic(_sourceContract1).transferFrom(
+    ERC721Full(_sourceContract1).transferFrom(
       _owner,
       address(1),
       _sourceTokenId1);
 
     if (_sourceContract2 != address(0)) {
-      ERC721Basic(_sourceContract2).transferFrom(
+      ERC721Full(_sourceContract2).transferFrom(
         _owner,
         address(1),
         _sourceTokenId2);
