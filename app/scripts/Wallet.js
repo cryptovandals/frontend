@@ -6,7 +6,6 @@ import Utils from "web3-utils";
 import Spinner from "react-spinkit";
 import Modal from "react-modal";
 
-import Canvas from "./Canvas";
 import getWeb3 from "./getWeb3";
 import getContract from "./contracts";
 import VandalizeMe from "../../deployment/contracts/VandalizeMe.json";
@@ -194,7 +193,6 @@ class Wallet extends Component {
                   style={customStyles}
                   ariaHideApp={false}
                 >
-                  <Canvas toggleModal={this.toggleModal(i)} kitty={kitty} />
                 </Modal>
               </div>
             ))}

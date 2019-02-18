@@ -1,20 +1,3 @@
-// @format
-// Running migration: 1_initial_migration.js Replacing Migrations...  ...
-// 0xc7f055344e96f21107175c4f98f1c1583d3d9942a74d7cf2be8d375acd26e2ac
-// Migrations: 0x8cdaf0cd259887258bc13a92c0a6da92698644c0 Saving successful
-// migration to network...  ...
-// 0xd7bc86d31bee32fa3988f1c1eabce403a1b5d570340a3a9cdba53a472ee8c956 Saving
-// artifacts...  Running migration: 2_deploy_contracts.js Replacing
-// CryptoVandals...  ...
-// 0x9f005be21fdfb2e53aee46a0db68c5937e2b138c07d83aaf7f84efd9e764b6fe
-// CryptoVandals: 0x345ca3e014aaf5dca488057592ee47305d9b3e10 Replacing
-// VandalizeMe...  ...
-// 0xcb07f1069868f3798e4118718f4ec38b459c8bd1aeb31fb1582a7ae7ca921ba9
-// VandalizeMe: 0xf25186b5081ff5ce73482ad761db0eb0d25abfbf Saving successful
-// migration to network...  ...
-// 0x059cf1bbc372b9348ce487de910358801bbbd1c89182853439bec0afaee6c7db Saving
-// artifacts...
-
 (async function() {
   function generateAddressesFromSeed(seed, count) {
     let bip39 = require("bip39");

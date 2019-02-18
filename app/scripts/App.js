@@ -6,7 +6,6 @@ import logo from "../../assets/cryptovandals-logo.png";
 import Manifesto from "./Manifesto";
 import Wallet from "./Wallet";
 import Gallery from "./Gallery";
-import DrawCanvas from "./Canvas";
 
 const GlobalStyle = createGlobalStyle`
   body {
