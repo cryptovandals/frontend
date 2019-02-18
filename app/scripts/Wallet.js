@@ -192,8 +192,7 @@ class Wallet extends Component {
                   onRequestClose={this.toggleModal(i)}
                   style={customStyles}
                   ariaHideApp={false}
-                >
-                </Modal>
+                />
               </div>
             ))}
           </KittenContainer>
