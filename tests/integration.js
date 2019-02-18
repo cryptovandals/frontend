@@ -1,6 +1,6 @@
 // @format
 require("dotenv").config();
-const SimpleWallet = require("./utils");
+const SimpleWallet = require("../lib/utils");
 const web3 = require("web3");
 const c = require("colors");
 
