@@ -45,44 +45,62 @@ contract CryptoVandals is ERC721Full, ERC721Mintable {
   function mint(
     address _owner,
 
-    address _sourceContract1,
-    uint256 _sourceTokenId1,
+    address _contract1,
+    uint256 _tokenId1,
 
-    address _sourceContract2,
-    uint256 _sourceTokenId2,
+    address _contract2,
+    uint256 _tokenId2,
 
-    string calldata _newTokenURI
-  ) external
+    string memory _newTokenURI
+  ) public
   {
     //
-    require(_sourceContract1.isContract());
-    require(_sourceContract2 == address(0) || _sourceContract2.isContract());
+    require(_contract1.isContract());
+    require(_contract2 == address(0) || _contract2.isContract());
 
-    ERC721Full(_sourceContract1).transferFrom(
+    ERC721Full(_contract1).transferFrom(
       _owner,
       address(1),
-      _sourceTokenId1);
+      _tokenId1);
 
-    if (_sourceContract2 != address(0)) {
-      ERC721Full(_sourceContract2).transferFrom(
+    if (_contract2 != address(0)) {
+      ERC721Full(_contract2).transferFrom(
         _owner,
         address(1),
-        _sourceTokenId2);
+        _tokenId2);
     }
 
     uint newTokenId = totalSupply();
 
     Source memory source = Source({
-      contract1: _sourceContract1,
-      tokenId1: _sourceTokenId1,
-      contract2: _sourceContract2,
-      tokenId2: _sourceTokenId2
+      contract1: _contract1,
+      tokenId1: _tokenId1,
+      contract2: _contract2,
+      tokenId2: _tokenId2
     });
 
     sources[newTokenId] = source;
 
     super._mint(_owner, newTokenId);
     super._setTokenURI(newTokenId, _newTokenURI);
+  }
+
+  function vandalize(
+    address _contract,
+    uint256 _tokenId,
+    string calldata _newTokenURI
+  ) external {
+    mint(msg.sender, _contract, _tokenId, address(0), 0, _newTokenURI);
+  }
+
+  function vandalize2(
+    address _contract1,
+    uint256 _tokenId1,
+    address _contract2,
+    uint256 _tokenId2,
+    string calldata _newTokenURI
+  ) external {
+    mint(msg.sender, _contract1, _tokenId1, _contract2, _tokenId2, _newTokenURI);
   }
 }
 
