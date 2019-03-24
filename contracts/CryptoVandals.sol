@@ -18,7 +18,7 @@
 // **Warning: Using this contract will destroy your NFT (and generate a new
 // one). Don't use it if you don't know what you are doing.**
 //
-// The logic of the contract is quite simple. The contract exposes two
+// The logic of the contract is simple. The contract exposes two
 // user friendly functions:
 // - `vandalize(address _contract, uint256 _tokenId, string _newTokenURI)`;
 // - ```vandalize2(
@@ -29,21 +29,23 @@
 //  string _newTokenURI)```;
 //
 // `vandalize` calls the `transferFrom` function (defined in the ERC721
-// standard) to *burn* the original NFT. Burning the NFT means to transfer it
-// from its original owner to the address `0x1` in the original contract.
+// standard) to *burn* the original NFT. In CryptoVandals, burning the 
+// NFT means transferring it from its original owner 
+// to the address `0x1` in the original contract.
 // After a successful transfer, the CryptoVandals contract mints a new NFT
 // (adding the metadata pointed by `_newTokenURI`) and assigns it to
-// `msg.sender`. A new record in the `sources` is then added. The record
-// contains the provenance of the NFT: the original contract address and token
-// ID.
+// `msg.sender`. A new record in the `sources` is then added. 
+// The record contains the provenance of the NFT: the original 
+// contract address and token ID.
 //
-// `vandalize2` works the same as `vandalize`, but allows to vandalize two NFTs
-// into a single, vandalized one. Use this function if you want to do something
-// fancy, like adding an audio track to a crypto kitty.
+// `vandalize2` works just like `vandalize`, but allows you to combine two NFTs
+// into a single, vandalized NFT. Magical! 
+// Use this function if you want to do something fancy, like adding an audio 
+// track to a Cryptokitty. 
 //
-// You can also vandalize again your vandalized NFTs. In that case the old NFT
-// is burnt, and a new one is minted. The `sources` is updated as well,
-// creating a list (or tree, if you use `vandalize2`) of parent NFTs.
+// You can also re-vandalize a NFT you've already vandalized. If you do this, 
+// the old NFT is burned, a new NFT is minted, and the `sources` is updated 
+// with a list (or tree, if you use `vandalize2`) of parent NFTs.
 //
 // Important: before calling any vandalize function, you **must** call
 // `approve(address to, uint256 tokenId)` in the contract where your NFT is
@@ -58,7 +60,7 @@ import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol';
 
 
-// We use OpenZeppelin ERC-721 as a baseline for our contract.
+// We use the OpenZeppelin ERC-721 standard as a baseline for CryptoVandals.
 contract CryptoVandals is ERC721Full, ERC721Mintable, ERC721Burnable {
 
   // Every new NFT token minted by this contract has one or two sources,
