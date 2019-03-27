@@ -4,4 +4,3 @@ build
 .env
 dist/
 app/contracts/*.json
-ethnode-data

@@ -13,15 +13,54 @@
  *         ##   "mm"#  #   #  "#m##  "mm"#    "mm  "mmm"
  */
 
+// # Welcome to the CryptoVandals Smart Contract
+//
+// **Warning: Using this contract will destroy your NFT (and generate a new
+// one). Don't use it if you don't know what you are doing.**
+//
+// The logic of the contract is simple. The contract exposes two
+// user friendly functions:
+// - `vandalize(address _contract, uint256 _tokenId, string _newTokenURI)`;
+// - ```vandalize2(
+//  address _contract1,
+//  uint256 _tokenId1,
+//  address _contract2,
+//  uint256 _tokenId2,
+//  string _newTokenURI)```;
+//
+// `vandalize` calls the `transferFrom` function (defined in the ERC721
+// standard) to *burn* the original NFT. In CryptoVandals, burning the 
+// NFT means transferring it from its original owner 
+// to the address `0x1` in the original contract.
+// After a successful transfer, the CryptoVandals contract mints a new NFT
+// (adding the metadata pointed by `_newTokenURI`) and assigns it to
+// `msg.sender`. A new record in the `sources` is then added. 
+// The record contains the provenance of the NFT: the original 
+// contract address and token ID.
+//
+// `vandalize2` works just like `vandalize`, but allows you to combine two NFTs
+// into a single, vandalized NFT. Magical! 
+// Use this function if you want to do something fancy, like adding an audio 
+// track to a Cryptokitty. 
+//
+// You can also re-vandalize a NFT you've already vandalized. If you do this, 
+// the old NFT is burned, a new NFT is minted, and the `sources` is updated 
+// with a list (or tree, if you use `vandalize2`) of parent NFTs.
+//
+// Important: before calling any vandalize function, you **must** call
+// `approve(address to, uint256 tokenId)` in the contract where your NFT is
+// currently stored. If you don't do that, CryptoVandals won't be able to burn
+// your NFT to generate a new one.
 
 
 pragma solidity >=0.4.21 <0.6.0;
 
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
+import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol';
 
-// We use OpenZeppelin ERC-721 as a baseline for our contract.
-contract CryptoVandals is ERC721Full, ERC721Mintable {
+// We use the OpenZeppelin ERC-721 standard as a baseline for CryptoVandals.
+contract CryptoVandals is ERC721Full, ERC721Mintable, ERC721Burnable {
 
   // Every new NFT token minted by this contract has one or two sources,
   // stored in the struct `Source`.
@@ -44,44 +83,62 @@ contract CryptoVandals is ERC721Full, ERC721Mintable {
   function mint(
     address _owner,
 
-    address _sourceContract1,
-    uint256 _sourceTokenId1,
+    address _contract1,
+    uint256 _tokenId1,
 
-    address _sourceContract2,
-    uint256 _sourceTokenId2,
+    address _contract2,
+    uint256 _tokenId2,
 
-    string calldata _newTokenURI
-  ) external
+    string memory _newTokenURI
+  ) public
   {
     //
-    require(_sourceContract1.isContract());
-    require(_sourceContract2 == address(0) || _sourceContract2.isContract());
+    require(_contract1.isContract());
+    require(_contract2 == address(0) || _contract2.isContract());
 
-    ERC721Full(_sourceContract1).transferFrom(
+    ERC721Full(_contract1).transferFrom(
       _owner,
       address(1),
-      _sourceTokenId1);
+      _tokenId1);
 
-    if (_sourceContract2 != address(0)) {
-      ERC721Full(_sourceContract2).transferFrom(
+    if (_contract2 != address(0)) {
+      ERC721Full(_contract2).transferFrom(
         _owner,
         address(1),
-        _sourceTokenId2);
+        _tokenId2);
     }
 
     uint newTokenId = totalSupply();
 
     Source memory source = Source({
-      contract1: _sourceContract1,
-      tokenId1: _sourceTokenId1,
-      contract2: _sourceContract2,
-      tokenId2: _sourceTokenId2
+      contract1: _contract1,
+      tokenId1: _tokenId1,
+      contract2: _contract2,
+      tokenId2: _tokenId2
     });
 
     sources[newTokenId] = source;
 
     super._mint(_owner, newTokenId);
     super._setTokenURI(newTokenId, _newTokenURI);
+  }
+
+  function vandalize(
+    address _contract,
+    uint256 _tokenId,
+    string calldata _newTokenURI
+  ) external {
+    mint(msg.sender, _contract, _tokenId, address(0), 0, _newTokenURI);
+  }
+
+  function vandalize2(
+    address _contract1,
+    uint256 _tokenId1,
+    address _contract2,
+    uint256 _tokenId2,
+    string calldata _newTokenURI
+  ) external {
+    mint(msg.sender, _contract1, _tokenId1, _contract2, _tokenId2, _newTokenURI);
   }
 }
 
