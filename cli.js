@@ -20,6 +20,7 @@ const ipfs = IPFS("ipfs.infura.io", "5001", { protocol: "https" });
 async function runMint(filename, address) {
   var tokenId;
   address = address || g("PUBLIC_KEY");
+  address = web3.utils.toChecksumAddress(address);
   const vandalizeMe = await wallet.loadContract("VandalizeMe");
 
   console.log(chalk`Using {green ${await wallet.getNetworkName()}}
@@ -91,5 +92,4 @@ program
   .command("vandalize <tokenId> <tokenContract> <filename>")
   .description("Vandalize a token.")
   .action(runVandalize);
-
 program.parse(process.argv);
